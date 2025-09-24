@@ -3,6 +3,7 @@ version: "3.8"
 services:
   postgres:
     image: postgres:16
+    container_name: projet-backend-postgres-1
     environment:
       POSTGRES_USER: maets
       POSTGRES_PASSWORD: maets
@@ -12,5 +13,6 @@ services:
 
   mongo:
     image: mongo:7
+    container_name: projet-backend-mongo-1
     ports:
       - "27017:27017"
