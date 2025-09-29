@@ -1,13 +1,27 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/sequelize.js';
+import { DataTypes } from "sequelize";
+import sequelize from "../config/sequelize.js";
 
-class User extends Model {}
-User.init({
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  email: { type: DataTypes.STRING, allowNull: false, unique: true },
-  passwordHash: { type: DataTypes.STRING, allowNull: false }
-}, { sequelize, modelName: 'user' });
+const User = sequelize.define("User", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  passwordHash: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  username: {
+    type: DataTypes.STRING,
+  }
+}, {
+  tableName: "users",   // correspond à ta table MariaDB
+  timestamps: false     // empêche Sequelize d’attendre createdAt/updatedAt
+});
 
 export default User;
-
-

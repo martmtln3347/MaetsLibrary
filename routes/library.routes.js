@@ -1,10 +1,12 @@
-import { Router } from 'express';
-import { getLibrary, addToLibrary, removeFromLibrary } from '../Controleur/library.controller.js';
-import { authenticate } from '../middlewares/auth.js';
+import express from "express";
+import { getLibrary, addToLibrary, removeFromLibrary } from "../Controleur/library.controller.js";
+import { authMiddleware } from "../middlewares/auth.js";
 
-const router = Router();
-router.get('/', authenticate, getLibrary);
-router.post('/:gameId', authenticate, addToLibrary);
-router.delete('/:gameId', authenticate, removeFromLibrary);
+const router = express.Router();
+
+// /me/library → déjà préfixé dans app.js
+router.get("/", authMiddleware, getLibrary);
+router.post("/:gameId", authMiddleware, addToLibrary);
+router.delete("/:gameId", authMiddleware, removeFromLibrary);
 
 export default router;

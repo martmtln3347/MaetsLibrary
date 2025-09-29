@@ -1,9 +1,11 @@
-import { Router } from 'express';
-import { getConfig, updateConfig } from '../Controleur/config.controller.js';
-import { authenticate } from '../middlewares/auth.js';
+import express from "express";
+import { getConfig, upsertConfig } from "../Controleur/config.controller.js";
+import { authMiddleware } from "../middlewares/auth.js";
 
-const router = Router();
-router.get('/:gameId', authenticate, getConfig);
-router.put('/:gameId', authenticate, updateConfig);
+const router = express.Router();
+
+// /me/configs → déjà préfixé dans app.js
+router.get("/:gameId", authMiddleware, getConfig);
+router.put("/:gameId", authMiddleware, upsertConfig);
 
 export default router;

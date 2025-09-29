@@ -1,18 +1,16 @@
-# docker-compose.yml
 version: "3.8"
 services:
-  postgres:
-    image: postgres:16
-    container_name: projet-backend-postgres-1
+  mariadb:
+    image: mariadb:10.11
     environment:
-      POSTGRES_USER: maets
-      POSTGRES_PASSWORD: maets
-      POSTGRES_DB: maets
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: maets
+      MYSQL_USER: maets
+      MYSQL_PASSWORD: maets
     ports:
-      - "5432:5432"
-
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
   mongo:
     image: mongo:7
-    container_name: projet-backend-mongo-1
     ports:
       - "27017:27017"

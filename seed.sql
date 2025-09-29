@@ -1,13 +1,18 @@
 -- ========================================
--- Jeu de données de test pour Maets
+-- Jeu de données de test pour Maets (MariaDB)
 -- ========================================
 
--- Nettoyage (au cas où on relance plusieurs fois)
+-- Nettoyage
 DELETE FROM user_game;
 DELETE FROM user_role;
 DELETE FROM jeux;
-DELETE FROM "user";
+DELETE FROM users;
 DELETE FROM role;
+
+-- Réinitialisation des auto-incréments
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE role AUTO_INCREMENT = 1;
+ALTER TABLE jeux AUTO_INCREMENT = 1;
 
 -- ========================================
 -- Rôles
@@ -18,27 +23,32 @@ INSERT INTO role (nom) VALUES
 
 -- ========================================
 -- Utilisateurs
--- ⚠️ passwordHash correspond au mot de passe "password"
--- bcrypt hash généré pour "password"
+-- bcrypt hash du mot de passe "password"
 -- $2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36hoG1B2Dk3k9l16nYc4cW.
 -- ========================================
-INSERT INTO "user" (email, passwordHash, username) VALUES
-('admin@maets.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36hoG1B2Dk3k9l16nYc4cW.', 'admin'),
-('alice@maets.com', '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36hoG1B2Dk3k9l16nYc4cW.', 'alice'),
-('bob@maets.com',   '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36hoG1B2Dk3k9l16nYc4cW.', 'bob');
+INSERT INTO users (email, passwordHash, username) VALUES
+('admin@maets.com', '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'admin'),
+('alice@maets.com', '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'alice'),
+('bob@maets.com',   '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'bob');
 
 -- ========================================
 -- Attribution des rôles
 -- ========================================
 -- admin → ROLE_ADMIN
-INSERT INTO user_role (userId, roleId) VALUES (1, 2);
+INSERT INTO user_role (userId, roleId)
+SELECT u.id, r.id
+FROM users u, role r
+WHERE u.email = 'admin@maets.com' AND r.nom = 'ROLE_ADMIN';
 
 -- alice & bob → ROLE_USER
-INSERT INTO user_role (userId, roleId) VALUES 
-(2, 1),
-(3, 1);
+INSERT INTO user_role (userId, roleId)
+SELECT u.id, r.id
+FROM users u, role r
+WHERE u.email IN ('alice@maets.com','bob@maets.com') AND r.nom = 'ROLE_USER';
 
-
+-- ========================================
+-- Jeux
+-- ========================================
 INSERT INTO jeux (slug, title, publisher, dateSortie) VALUES
 ('zelda-tp', 'The Legend of Zelda: Twilight Princess', 'Nintendo', '2006-11-19'),
 ('witcher-3', 'The Witcher 3: Wild Hunt', 'CD Projekt', '2015-05-19'),
@@ -48,28 +58,18 @@ INSERT INTO jeux (slug, title, publisher, dateSortie) VALUES
 -- Librairie utilisateurs
 -- ========================================
 -- Alice → Zelda & Minecraft
-INSERT INTO user_game (userId, gameId) VALUES
-(2, 1),
-(2, 3);
+INSERT INTO user_game (userId, gameId)
+SELECT u.id, j.id
+FROM users u, jeux j
+WHERE u.email = 'alice@maets.com' AND j.slug = 'zelda-tp';
+
+INSERT INTO user_game (userId, gameId)
+SELECT u.id, j.id
+FROM users u, jeux j
+WHERE u.email = 'alice@maets.com' AND j.slug = 'minecraft';
 
 -- Bob → The Witcher 3
-INSERT INTO user_game (userId, gameId) VALUES
-(3, 2);
-
--- ========================================
--- Vérifications manuelles (à exécuter dans psql)
--- ========================================
--- Vérifier les rôles :
--- SELECT * FROM role;
---
--- Vérifier les utilisateurs :
--- SELECT id, email, username FROM "user";
---
--- Vérifier les associations user ↔ role :
--- SELECT * FROM user_role;
---
--- Vérifier les jeux :
--- SELECT id, slug, title, publisher, dateSortie FROM jeux;
---
--- Vérifier la librairie des users :
--- SELECT * FROM user_game;
+INSERT INTO user_game (userId, gameId)
+SELECT u.id, j.id
+FROM users u, jeux j
+WHERE u.email = 'bob@maets.com' AND j.slug = 'witcher-3';
