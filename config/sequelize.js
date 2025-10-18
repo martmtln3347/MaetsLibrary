@@ -5,7 +5,6 @@ dotenv.config();
 
 console.log("DB Config:", process.env.MYSQL_DATABASE, process.env.MYSQL_USER, process.env.MYSQL_HOST);
 
-
 const sequelize = new Sequelize(
   process.env.MYSQL_DATABASE,
   process.env.MYSQL_USER,
@@ -17,13 +16,5 @@ const sequelize = new Sequelize(
     logging: false,
   }
 );
-
-// Test de connexion (optionnel mais pratique)
-try {
-  await sequelize.authenticate();
-  console.log("✅ Connexion MariaDB OK");
-} catch (error) {
-  console.error("❌ Erreur de connexion MariaDB :", error.message);
-}
 
 export default sequelize;

@@ -9,11 +9,6 @@ dotenv.config();
 import sequelize from "./config/sequelize.js";
 import "./Modele/associations.js"; // associations entre User, Game, Role, Library
 
-// --- DB NoSQL (MongoDB) --- //
-mongoose.connect(process.env.MONGO_URL)
-  .then(() => console.log("✅ MongoDB OK"))
-  .catch(err => console.error("❌ MongoDB KO:", err));
-
 // --- Express --- //
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,13 +40,24 @@ app.get("/", (req, res) => {
 import { errorHandler } from "./middlewares/error.js";
 app.use(errorHandler);
 
-// --- Lancement serveur --- //
-app.listen(PORT, async () => {
-  try {
-    await sequelize.authenticate();
-    console.log("✅ Connexion MariaDB OK");
-  } catch (err) {
-    console.error("❌ Erreur connexion MariaDB :", err);
-  }
-  console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
-});
+// ✅ Export de l’app pour les tests
+export default app;
+
+// --- Lancement du serveur uniquement si pas en mode test --- //
+if (process.env.NODE_ENV !== "test") {
+  // --- DB NoSQL (MongoDB) --- //
+  mongoose
+    .connect(process.env.MONGO_URL)
+    .then(() => console.log("✅ MongoDB OK"))
+    .catch((err) => console.error("❌ MongoDB KO:", err));
+
+  app.listen(PORT, async () => {
+    try {
+      await sequelize.authenticate();
+      console.log("✅ Connexion MariaDB OK");
+    } catch (err) {
+      console.error("❌ Erreur connexion MariaDB :", err);
+    }
+    console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
+  });
+}

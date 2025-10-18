@@ -24,12 +24,12 @@ INSERT INTO role (nom) VALUES
 -- ========================================
 -- Utilisateurs
 -- bcrypt hash du mot de passe "password"
--- $2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36hoG1B2Dk3k9l16nYc4cW.
+-- généré avec bcrypt.hash("password", 10)
 -- ========================================
 INSERT INTO users (email, passwordHash, username) VALUES
-('admin@maets.com', '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'admin'),
-('alice@maets.com', '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'alice'),
-('bob@maets.com',   '$2b$10$S43zksspoUb0mACb9hYXzOti5GOpZlUAYsrW84i7fw3RhE43QG0bi', 'bob');
+('admin@maets.com', '$2b$10$eMs7NhZvZU5rwjhkRSazyOGa2mdxiMrSf3L/y0tG03lXfHUrMZV.G', 'admin'),
+('alice@maets.com', '$2b$10$eMs7NhZvZU5rwjhkRSazyOGa2mdxiMrSf3L/y0tG03lXfHUrMZV.G', 'alice'),
+('bob@maets.com',   '$2b$10$eMs7NhZvZU5rwjhkRSazyOGa2mdxiMrSf3L/y0tG03lXfHUrMZV.G', 'bob');
 
 -- ========================================
 -- Attribution des rôles
