@@ -303,7 +303,7 @@ Exemple :
 
 ## 👤 Auteur
 
-**Nom :** MANTOULAN Martin 
+**Nom :** -----
 **Établissement :** Efrei – Bachelor 3 Développeur Web  
 **Projet :** Maets Back-End — Bloc 2  
 **Année :** 2025   
