@@ -75,4 +75,21 @@ if (process.env.NODE_ENV !== "test") {
     }
     console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);
   });
+
 }
+
+import fs from "fs";
+import https from "https";
+
+if (process.env.NODE_ENV !== "test") {
+  const SSL_PORT = process.env.SSL_PORT || 3443;
+
+  // ⚠️ Utilise bien les PEM générés par mkcert ci-dessus
+  const key = fs.readFileSync("./ssl/localhost-key.pem");
+  const cert = fs.readFileSync("./ssl/localhost-cert.pem");
+
+  https.createServer({ key, cert }, app).listen(SSL_PORT, () => {
+    console.log(`🔒 HTTPS (mkcert) sur https://localhost:${SSL_PORT}`);
+  });
+}
+

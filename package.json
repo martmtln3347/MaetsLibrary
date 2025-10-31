@@ -19,10 +19,7 @@
     "check:quality": "npm run lint && npm test",
     "seed:sql": "node scripts/seed.js",
     "reset-db": "node reset-db.js",
-    "backup:sql": "bash scripts/backup_sql.sh",
-    "backup:mongo": "bash scripts/backup_mongo.sh",
-    "backup:sql:win": "powershell -ExecutionPolicy Bypass -File scripts/backup-sql.ps1",
-    "backup:mongo:win": "powershell -ExecutionPolicy Bypass -File scripts/backup-mongo.ps1",
+    "backup:sql": "node scripts/backup-sql.js",
     "backup:all": "npm run backup:sql && npm run backup:mongo",
     "backup:all:win": "powershell -ExecutionPolicy Bypass -Command \"npm run backup:sql:win; npm run backup:mongo:win\"",
     "restore:sql": "bash scripts/restore_sql.sh",
@@ -36,6 +33,7 @@
     "release:dry": "standard-version --dry-run",
     "prepare": "husky install",
     "seed": "node scripts/seed.js",
+    "backup:mongo": "node scripts/backup-mongo.js",
     "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules c8 --check-coverage --lines 50 --functions 50 --branches 50 --statements 50 -r text -r html -r lcov mocha --file test/setup.test.js \"test/**/*.test.js\" --timeout 8000"
   },
   "keywords": [
