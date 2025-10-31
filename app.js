@@ -40,16 +40,31 @@ app.get("/", (req, res) => {
 import { errorHandler } from "./middlewares/error.js";
 app.use(errorHandler);
 
+// --- Swagger --- //
+import setupSwagger from "./config/swagger.js";
+setupSwagger(app);
+
 // ✅ Export de l’app pour les tests
 export default app;
 
 // --- Lancement du serveur uniquement si pas en mode test --- //
 if (process.env.NODE_ENV !== "test") {
   // --- DB NoSQL (MongoDB) --- //
-  mongoose
-    .connect(process.env.MONGO_URL)
-    .then(() => console.log("✅ MongoDB OK"))
-    .catch((err) => console.error("❌ MongoDB KO:", err));
+  // (Optionnel) synchro des index du modèle de config pour garantir l'unicité userId+gameId
+  import("./Modele/config.model.js").then(({ default: GameConfig }) => {
+    mongoose
+      .connect(process.env.MONGO_URL)
+      .then(async () => {
+        console.log("✅ MongoDB OK");
+        try {
+          await GameConfig.syncIndexes();
+          console.log("🧱 Index MongoDB synchronisés (GameConfig)");
+        } catch (e) {
+          console.error("⚠️ syncIndexes(GameConfig) a échoué:", e.message);
+        }
+      })
+      .catch((err) => console.error("❌ MongoDB KO:", err));
+  });
 
   app.listen(PORT, async () => {
     try {

@@ -1,33 +1,29 @@
-import { ObjectId } from "mongodb";
-import sequelize from "../config/sequelize.js";
-import User from "../Modele/user.model.js";
 import Game from "../Modele/game.model.js";
-import { getMongoDb } from "../config/mongo.js";
+import GameConfig from "../Modele/config.model.js";
+
+const DEFAULT_SETTINGS = {
+  difficulty: "normal",
+  resolution: "1080p",
+  language: "fr",
+  dlcs: [],
+};
 
 // GET /me/configs/:gameId
 export const getConfig = async (req, res) => {
   try {
-    const userId = req.user.id; // récupéré via JWT
-    const gameId = parseInt(req.params.gameId, 10);
+    const userId = req.user.id;
+    const gameId = Number(req.params.gameId);
 
-    // Vérif SQL : le jeu existe ?
     const game = await Game.findByPk(gameId);
-    if (!game) {
-      return res.status(404).json({ error: "Jeu non trouvé" });
-    }
+    if (!game) return res.status(404).json({ error: "Jeu non trouvé" });
 
-    // Récup Mongo
-    const db = await getMongoDb();
-    const config = await db.collection("game_configs").findOne({ userId, gameId });
+    const config = await GameConfig.findOne({ userId, gameId }).lean();
+    if (!config) return res.status(404).json({ error: "Aucune config trouvée pour ce jeu" });
 
-    if (!config) {
-      return res.status(404).json({ error: "Aucune config trouvée pour ce jeu" });
-    }
-
-    res.json(config);
+    return res.status(200).json(config);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur" });
+    console.error("getConfig error:", err);
+    return res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
 
@@ -35,34 +31,47 @@ export const getConfig = async (req, res) => {
 export const updateConfig = async (req, res) => {
   try {
     const userId = req.user.id;
-    const gameId = parseInt(req.params.gameId, 10);
-    const newSettings = req.body.settings;
+    const gameId = Number(req.params.gameId);
 
-    if (!newSettings) {
-      return res.status(400).json({ error: "Les settings sont requis" });
+    // Accepte les deux formats de body:
+    //  - à plat: { resolution, difficulty, ... }
+    //  - wrapper: { settings: { resolution, difficulty, ... } }
+    const incoming =
+      req.body && typeof req.body === "object"
+        ? (req.body.settings && typeof req.body.settings === "object" ? req.body.settings : req.body)
+        : null;
+
+    if (!incoming) {
+      return res
+        .status(400)
+        .json({ error: "Les settings sont requis (JSON): à plat ou { settings: {...} }" });
     }
 
-    // Vérif SQL : le jeu existe ?
     const game = await Game.findByPk(gameId);
-    if (!game) {
-      return res.status(404).json({ error: "Jeu non trouvé" });
-    }
+    if (!game) return res.status(404).json({ error: "Jeu non trouvé" });
 
-    // Connexion Mongo
-    const db = await getMongoDb();
+    // On récupère l'existant pour fusionner
+    const existing = await GameConfig.findOne({ userId, gameId }).lean();
+    const merged = {
+      ...DEFAULT_SETTINGS,
+      ...(existing?.settings || {}),
+      ...incoming, // les champs envoyés écrasent les précédents
+    };
 
-    // Upsert (update ou insert si ça n’existe pas)
-    await db.collection("game_configs").updateOne(
+    const updated = await GameConfig.findOneAndUpdate(
       { userId, gameId },
-      { $set: { settings: newSettings } },
-      { upsert: true }
-    );
+      { $set: { settings: merged } },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
 
-    const updated = await db.collection("game_configs").findOne({ userId, gameId });
-
-    res.json(updated);
+    const created = !existing;
+    return res.status(created ? 201 : 200).json(updated);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur" });
+    if (err?.code === 11000) {
+      // rare ici car on upsert sur la même clé, mais au cas où:
+      return res.status(409).json({ error: "Une configuration existe déjà pour ce jeu" });
+    }
+    console.error("updateConfig error:", err);
+    return res.status(500).json({ error: "Erreur serveur", details: err.message });
   }
 };
