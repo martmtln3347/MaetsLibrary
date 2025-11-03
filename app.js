@@ -47,25 +47,27 @@ setupSwagger(app);
 // ✅ Export de l’app pour les tests
 export default app;
 
-// --- Lancement du serveur uniquement si pas en mode test --- //
-if (process.env.NODE_ENV !== "test") {
-  // --- DB NoSQL (MongoDB) --- //
-  // (Optionnel) synchro des index du modèle de config pour garantir l'unicité userId+gameId
-  import("./Modele/config.model.js").then(({ default: GameConfig }) => {
-    mongoose
-      .connect(process.env.MONGO_URL)
-      .then(async () => {
-        console.log("✅ MongoDB OK");
-        try {
-          await GameConfig.syncIndexes();
-          console.log("🧱 Index MongoDB synchronisés (GameConfig)");
-        } catch (e) {
-          console.error("⚠️ syncIndexes(GameConfig) a échoué:", e.message);
-        }
-      })
-      .catch((err) => console.error("❌ MongoDB KO:", err));
-  });
+// --- DB NoSQL (MongoDB) --- //
+// Toujours se connecter à MongoDB (y compris en mode test) pour que
+// les modèles Mongoose utilisés pendant les tests puissent effectuer
+// des opérations sans buffering timeout.
+import("./Modele/config.model.js").then(({ default: GameConfig }) => {
+  mongoose
+    .connect(process.env.MONGO_URL)
+    .then(async () => {
+      console.log("✅ MongoDB OK");
+      try {
+        await GameConfig.syncIndexes();
+        console.log("🧱 Index MongoDB synchronisés (GameConfig)");
+      } catch (e) {
+        console.error("⚠️ syncIndexes(GameConfig) a échoué:", e.message);
+      }
+    })
+    .catch((err) => console.error("❌ MongoDB KO:", err));
+});
 
+// Lancement du serveur uniquement si pas en mode test
+if (process.env.NODE_ENV !== "test") {
   app.listen(PORT, async () => {
     try {
       await sequelize.authenticate();

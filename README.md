@@ -74,6 +74,64 @@ projet-backend/
 
 ---
 
+
+
+---
+
+## 🧰 Environnement de développement
+
+L’environnement de développement du projet **Maets Backend** a été configuré et personnalisé afin d’assurer une expérience fluide, sécurisée et homogène entre les différents environnements (développement, test et production).
+
+### 🔧 Outils et configuration
+
+Utilisation de VSCode pour le développement.
+
+Le projet repose sur **Node.js 18+** et un ensemble d’outils cohérents :  
+- **Express** pour le serveur web  
+- **Sequelize** (ORM SQL) et **Mongoose** (ODM NoSQL)  
+- **dotenv** pour la gestion centralisée des variables d’environnement  
+- **Mocha + Chai + Supertest** pour les tests unitaires et d’intégration  
+- **c8** pour la couverture de code  
+- **Swagger JSDoc** pour la documentation automatique de l’API
+- **Docker / Docker Compose** pour un environnement local reproductibl(bases de données et exécution en conteneur)  
+
+Les variables sensibles (ports, mots de passe, secrets JWT, URLs de bases de données) sont stockées dans un fichier `.env` non versionné. Un modèle `.env.sample` est fourni pour garantir une configuration reproductible sur tout poste de développement.
+
+### 💻 Organisation de l’environnement local
+
+Le développement se fait sur un environnement local complet :  
+- **MariaDB** pour la partie SQL  
+- **MongoDB** pour la partie NoSQL  
+
+Un script `seed.js` initialise automatiquement la base de données via :
+
+```bash
+npm run seed
+```
+
+Les données de test (utilisateurs, rôles, jeux) sont injectées grâce au fichier `seed.sql`, garantissant la portabilité entre environnements.
+
+### 🔒 Sécurité et confort de développement
+
+Le serveur est également accessible en **HTTPS local** via un certificat auto-signé généré avec **mkcert**.  
+Cela permet de simuler un environnement de production sécurisé sans déclencher d’avertissement navigateur :
+
+```bash
+mkcert -install
+mkcert -key-file ssl/localhost-key.pem -cert-file ssl/localhost-cert.pem localhost 127.0.0.1 ::1
+```
+
+### ⚙️ Automatisation
+
+Des scripts dédiés simplifient les tâches courantes :
+- `npm run seed` → initialise la base SQL  
+- `npm run backup:sql` / `npm run backup:mongo` → sauvegardes automatiques  
+- `npm test` → exécute la suite de tests avec configuration isolée (`NODE_ENV=test`)  
+- `npm start` → lance simultanément les serveurs HTTP et HTTPS avec vérification automatique des connexions SQL et NoSQL  
+
+Cette organisation assure une **installation rapide**, une **reproductibilité complète** et une **maintenance facilitée**.
+
+
 ## ⚙️ Installation
 
 ### 1️⃣ Cloner le projet
@@ -299,11 +357,4 @@ Exemple :
 - **E4 – Épreuve 4** → API sécurisée, testée, documentée  
 - **Module Back-End** → respect du MVC, REST, sauvegardes et HTTPS  
 
----
 
-## 👤 Auteur
-
-**Nom :** MANTOULAN Martin 
-**Établissement :** Efrei – Bachelor 3 Développeur Web  
-**Projet :** Maets Back-End — Bloc 2  
-**Année :** 2025   
