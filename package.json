@@ -28,7 +28,8 @@
     "prepare": "husky install",
     "seed": "node scripts/seed.js",
     "backup:mongo": "node scripts/backup-mongo.js",
-    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules c8 --check-coverage --lines 50 --functions 50 --branches 50 --statements 50 -r text -r html -r lcov mocha --file test/setup.test.js \"test/**/*.test.js\" --timeout 8000"
+    "test": "cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules c8 --check-coverage --lines 50 --functions 50 --branches 50 --statements 50 -r text -r html -r lcov mocha --file test/setup.test.js \"test/**/*.test.js\" --timeout 8000",
+    "zip:clean": "node zip-needed.js"
   },
   "keywords": [
     "nodejs",

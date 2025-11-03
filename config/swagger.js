@@ -24,10 +24,15 @@ const options = {
         </ul>
       `,
     },
+    // Prefer the /api prefix as the canonical API base. Keep root as legacy option.
     servers: [
       {
+        url: "http://localhost:3000/api",
+        description: "Serveur local - base API (/api)",
+      },
+      {
         url: "http://localhost:3000",
-        description: "Serveur local (développement)",
+        description: "Serveur local - root (legacy)",
       },
     ],
     components: {

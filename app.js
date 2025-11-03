@@ -21,10 +21,18 @@ import gameRoutes from "./routes/game.routes.js";
 import libraryRoutes from "./routes/library.routes.js";
 import configRoutes from "./routes/config.routes.js";
 
-app.use("/auth", userRoutes);          // Register / Login
-app.use("/games", gameRoutes);         // CRUD des jeux
-app.use("/me/library", libraryRoutes); // Librairie utilisateur
-app.use("/me/configs", configRoutes);  // Configurations de jeux
+// Expose API under /api to provide a clear API prefix for consumers
+app.use("/api/auth", userRoutes);          // Register / Login
+app.use("/api/games", gameRoutes);         // CRUD des jeux
+app.use("/api/me/library", libraryRoutes); // Librairie utilisateur
+app.use("/api/me/configs", configRoutes);  // Configurations de jeux
+
+// Backward compatibility: also mount routes without the `/api` prefix so
+// older tests/clients that call the root paths continue to work.
+app.use("/auth", userRoutes);
+app.use("/games", gameRoutes);
+app.use("/me/library", libraryRoutes);
+app.use("/me/configs", configRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
@@ -90,8 +98,16 @@ if (process.env.NODE_ENV !== "test") {
   const key = fs.readFileSync("./ssl/localhost-key.pem");
   const cert = fs.readFileSync("./ssl/localhost-cert.pem");
 
-  https.createServer({ key, cert }, app).listen(SSL_PORT, () => {
-    console.log(`🔒 HTTPS (mkcert) sur https://localhost:${SSL_PORT}`);
-  });
+  try {
+    const httpsServer = https.createServer({ key, cert }, app);
+    httpsServer.on("error", (err) => {
+      console.error(`⚠️  HTTPS server error: ${err.message}`);
+    });
+    httpsServer.listen(SSL_PORT, () => {
+      console.log(`🔒 HTTPS (mkcert) sur https://localhost:${SSL_PORT}`);
+    });
+  } catch (err) {
+    console.error("⚠️  Impossible de démarrer le serveur HTTPS:", err.message);
+  }
 }
 
