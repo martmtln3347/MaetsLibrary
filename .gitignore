@@ -36,7 +36,9 @@ out/
 # Database dumps & backups
 backups/
 *.sql
-projet-backend.zip
+!seed.sql
+!reset.sql
+*.zip
 
 # SSL / certs
 ssl/
