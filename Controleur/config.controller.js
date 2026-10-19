@@ -27,7 +27,7 @@ export const getConfig = async (req, res) => {
     return res.status(200).json(config);
   } catch (err) {
     console.error("getConfig error:", err);
-    return res.status(500).json({ error: "Erreur serveur", details: err.message });
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 };
 
@@ -81,6 +81,6 @@ export const updateConfig = async (req, res) => {
       return res.status(409).json({ error: "Une configuration existe déjà pour ce jeu" });
     }
     console.error("updateConfig error:", err);
-    return res.status(500).json({ error: "Erreur serveur", details: err.message });
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 };

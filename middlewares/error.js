@@ -1,4 +1,4 @@
 export function errorHandler(err, req, res, next) {
   console.error(err);
-  res.status(500).json({ error: 'Erreur interne', details: err.message });
+  res.status(500).json({ error: 'Erreur interne' });
 }

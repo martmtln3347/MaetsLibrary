@@ -60,6 +60,6 @@ describe("User routes (Register & Login)", () => {
       .send({ email: "alice@maets.com", password: "wrongpass" });
 
     expect(res.status).to.equal(401);
-    expect(res.body).to.have.property("error", "Mot de passe invalide");
+    expect(res.body).to.have.property("error", "Identifiants invalides");
   });
 });

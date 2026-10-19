@@ -40,10 +40,7 @@ export async function register(req, res) {
     return res.status(201).json(formatUser(user));
   } catch (err) {
     console.error("❌ Erreur register:", err);
-    return res.status(400).json({
-      error: "Impossible de créer l’utilisateur",
-      details: err.message,
-    });
+    return res.status(400).json({ error: "Impossible de créer l’utilisateur" });
   }
 }
 
@@ -72,13 +69,13 @@ export async function login(req, res) {
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Utilisateur inconnu" });
+      return res.status(401).json({ error: "Identifiants invalides" });
     }
 
     // --- Vérification du mot de passe ---
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
-      return res.status(401).json({ error: "Mot de passe invalide" });
+      return res.status(401).json({ error: "Identifiants invalides" });
     }
 
     // --- Rôles associés ---
@@ -96,10 +93,7 @@ export async function login(req, res) {
     return res.status(200).json({ token });
   } catch (err) {
     console.error("❌ Erreur dans login:", err);
-    return res.status(500).json({
-      error: "Erreur serveur",
-      details: err.message,
-    });
+    return res.status(500).json({ error: "Erreur serveur" });
   }
 }
 
@@ -122,6 +116,6 @@ export async function getProfile(req, res) {
     res.status(200).json(formatUser(user));
   } catch (err) {
     console.error("❌ Erreur getProfile:", err);
-    res.status(500).json({ error: "Erreur serveur", details: err.message });
+    res.status(500).json({ error: "Erreur serveur" });
   }
 }

@@ -4,7 +4,7 @@ import Library from "../Modele/library.model.js";
 
 // --- GET /me/library ---
 export async function getLibrary(req, res) {
-  const userId = req.user?.id || 1;
+  const userId = req.user.id;
   try {
     const user = await User.findByPk(userId, {
       include: [
@@ -27,32 +27,28 @@ export async function getLibrary(req, res) {
 
     res.json(games);
   } catch (err) {
-    res.status(500).json({
-      error: "Erreur récupération librairie",
-      details: err.message,
-    });
+    console.error("❌ Erreur getLibrary:", err);
+    res.status(500).json({ error: "Erreur récupération librairie" });
   }
 }
 
 // --- POST /me/library/:gameId ---
 export async function addToLibrary(req, res) {
-  const userId = req.user?.id || 1;
+  const userId = req.user.id;
   const gameId = req.params.gameId;
 
   try {
     await Library.create({ userId, gameId });
     res.status(201).json({ message: "Jeu ajouté à la librairie" });
   } catch (err) {
-    res.status(400).json({
-      error: "Impossible d’ajouter à la librairie",
-      details: err.message,
-    });
+    console.error("❌ Erreur addToLibrary:", err);
+    res.status(400).json({ error: "Impossible d’ajouter à la librairie" });
   }
 }
 
 // --- DELETE /me/library/:gameId ---
 export async function removeFromLibrary(req, res) {
-  const userId = req.user?.id || 1;
+  const userId = req.user.id;
   const gameId = req.params.gameId;
 
   try {
@@ -61,9 +57,7 @@ export async function removeFromLibrary(req, res) {
 
     res.json({ message: "Jeu retiré de la librairie" });
   } catch (err) {
-    res.status(500).json({
-      error: "Erreur suppression",
-      details: err.message,
-    });
+    console.error("❌ Erreur removeFromLibrary:", err);
+    res.status(500).json({ error: "Erreur suppression" });
   }
 }
